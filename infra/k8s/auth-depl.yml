@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth # este nombre auth coincide con el nombre app de matchLabels del deployment, es para indicar los pods que el deployment va administrar o usar
+    spec:
+      containers:
+        - name: auth
+          image: us.gcr.io/ticketing-dev-381622/auth
+--- # separar la creacion de objetos con 3 guiones
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+spec:
+  selector:
+    app: auth # sbaer cual o cuales pods va usar este servicio
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+
