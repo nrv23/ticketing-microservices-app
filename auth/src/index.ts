@@ -1,6 +1,8 @@
 import express from "express";
 import 'express-async-errors'; // manejo de errores asincronos en express
 import http from 'http';
+import cookieSession from "cookie-session";
+
 import { currentUserRouter } from "./routes/current-user";
 import { signinRouter } from "./routes/signin";
 import { signoutRouter } from "./routes/signout";
@@ -11,8 +13,17 @@ import connectDB from "./config/db";
 
 
 const app = express();
+app.set("trust proxy", true);
+
 const PORT: number = 3000;
 
+// se va guardar el jwt como una cookie
+app.use(
+  cookieSession({ //
+    signed: false, // no encriptar el token que se va enviar la cabecera el cookie
+    secure: true // el cookie se va enviar unicamente en conexiones https
+  })
+)
 app.use(express.json());
 
 
@@ -31,6 +42,10 @@ app.use(errorHandler); // express pasa los parametros por referencia y llama la 
 // este middleware lo atrapa y devuelve la respuesta al cliente.
 
 const start = async () => {
+
+  if(!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET debe estar definida");
+  } 
 
 
   try {

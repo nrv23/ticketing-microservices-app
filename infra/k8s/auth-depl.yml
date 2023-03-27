@@ -15,6 +15,12 @@ spec:
       containers:
         - name: auth
           image: us.gcr.io/ticketing-dev-381622/auth
+          env:
+            - name: JWT_SECRET # este es el nombre de la variable de entorno que guarda el secret generic en kubernetes
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret # este es el nombre del secret generic que creó en kubernetes
+                  key: JWT_SECRET
 --- # separar la creacion de objetos con 3 guiones
 apiVersion: v1
 kind: Service
