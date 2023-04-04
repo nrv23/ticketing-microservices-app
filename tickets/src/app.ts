@@ -1,12 +1,9 @@
 import express from "express";
 import "express-async-errors";
 import cookieSession from "cookie-session";
-import { errorHandler, NotFoundError } from "@nrvtickets/common";
+import { errorHandler, NotFoundError, currentUser } from "@nrvtickets/common";
+import { createTicketRouter } from "../routes/__test_/new";
 
-import { currentUserRouter } from "./routes/current-user";
-import { signinRouter } from "./routes/signin";
-import { signoutRouter } from "./routes/signout";
-import { signupRouter } from "./routes/signup";
 
 const app = express();
 app.set("trust proxy", true);
@@ -18,10 +15,9 @@ app.use(
   })
 );
 
-app.use(currentUserRouter);
-app.use(signinRouter);
-app.use(signoutRouter);
-app.use(signupRouter);
+app.use(currentUser); // validar que la peitcion entrante sea de alguien autenticado
+
+app.use(createTicketRouter);
 
 app.all("*", async (req, res) => {
   throw new NotFoundError();

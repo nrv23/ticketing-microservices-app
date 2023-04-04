@@ -1,38 +1,55 @@
-import { Router, Response, Request } from "express";
-import { body } from 'express-validator';
-import User from "../models/user";
-import { validateRequest } from './middleware/validate-request';
-import { BadRequestError } from '../errors/badrequest-error';
-import { Password } from '../utils/password';
-import { Token } from '../utils/token';
+import express, { Request, Response } from "express";
+import { body } from "express-validator";
+import jwt from "jsonwebtoken";
+import { validateRequest, BadRequestError } from "@nrvtickets/common";
 
-const router = Router();
+import { Password } from "../services/password";
+import { User } from "../models/user";
 
-router.post("/api/users/signin",
-    [
-        body("email").isEmail().withMessage("El email debe ser válido"),
-        body("password").trim().isLength({ min: 4, max: 20 }).withMessage("El password debe contener entre 4 y 20 caracteres")
-    ]
-    , validateRequest, async (req: Request, res: Response) => {
+const router = express.Router();
 
+router.post(
+  "/api/users/signin",
+  [
+    body("email").isEmail().withMessage("Email must be valid"),
+    body("password")
+      .trim()
+      .notEmpty()
+      .withMessage("You must supply a password"),
+  ],
+  validateRequest,
+  async (req: Request, res: Response) => {
     const { email, password } = req.body;
-    const user = await User.findOne({email});
 
-    if(!user) {
-       throw new BadRequestError("Credenciales incorrectas"); 
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      throw new BadRequestError("Invalid credentials");
     }
 
-    if(!(await Password.compare(user.password,password))) {
-        throw new BadRequestError("Credenciales incorrectas"); 
+    const passwordsMatch = await Password.compare(
+      existingUser.password,
+      password
+    );
+    if (!passwordsMatch) {
+      throw new BadRequestError("Invalid Credentials");
     }
 
-    req.session = { // setear el token en la cookie, de esa forma el navegador va manejar automaticamente el envio del token en cada peticion
-        jwt: Token.signToken(user.id, user.email )
+    // Generate JWT
+    const userJwt = jwt.sign(
+      {
+        id: existingUser.id,
+        email: existingUser.email,
+      },
+      process.env.JWT_SECRET!
+    );
+
+    // Store it on session object
+    req.session = {
+      jwt: userJwt,
     };
-    
-    res.status(200).send(user);
 
+    res.status(200).send(existingUser);
+  }
+);
 
-})
-
-export { router as signinRouter }
+export { router as signinRouter };

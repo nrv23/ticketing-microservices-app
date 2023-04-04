@@ -1,12 +1,10 @@
-import { Router } from "express";
-import { currentUser } from "./middleware/current-user";
+import express from "express";
+import { currentUser } from "@nrvtickets/common";
 
+const router = express.Router();
 
-const router = Router();
-
-router.get("/api/users/currentuser", currentUser,(req, res) => {
-
-    res.send({currentUser: !req.currentUser? null: req.currentUser});
+router.get("/api/users/currentuser", currentUser, (req, res) => {
+  res.send({ currentUser: req.currentUser || null });
 });
 
-export { router as currentUserRouter }
+export { router as currentUserRouter };

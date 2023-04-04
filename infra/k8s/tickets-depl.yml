@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: tickets-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: tickets
   template:
     metadata:
       labels:
-        app: auth # este nombre auth coincide con el nombre app de matchLabels del deployment, es para indicar los pods que el deployment va administrar o usar
+        app: tickets # este nombre auth coincide con el nombre app de matchLabels del deployment, es para indicar los pods que el deployment va administrar o usar
     spec:
       containers:
-        - name: auth
-          image: nrv2391/ticketing-auth
+        - name: tickets
+          image: nrv2391/ticketing-tickets
           env:
             - name: MONGO_URI
-              value: "mongodb://auth-mongo-srv:27017/auth"
+              value: 'mongodb://tickets-mongo-srv:27017/tickets'
             - name: JWT_SECRET # este es el nombre de la variable de entorno que guarda el secret generic en kubernetes
               valueFrom:
                 secretKeyRef:
@@ -27,12 +27,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-srv
+  name: tickets-srv
 spec:
   selector:
-    app: auth # sbaer cual o cuales pods va usar este servicio
+    app: tickets # sbaer cual o cuales pods va usar este servicio
   ports:
-    - name: auth
+    - name: tickets
       protocol: TCP
       port: 3000
       targetPort: 3000

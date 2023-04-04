@@ -1,25 +1,23 @@
 import request from 'supertest';
-import app from '../../app';
+import { app } from '../../app';
 
-it("Devolver detalles de un usuario logueado", async () => {
+it('responds with details about the current user', async () => {
+  const cookie = await global.signin();
 
-
-    const cookie = await signin();
-
-    const response = await request(app)
-        .get("/api/users/currentuser")
-        .set("Cookie",cookie)
-        .send()
-        .expect(200);
-
-    expect(response.body.currentUser.email).toEqual("nrv2391@gmail.com")
-});
-
-it("Responder con null si no esta autenticado", async () => {
-    const response = await request(app)
-    .get("/api/users/currentuser")
+  const response = await request(app)
+    .get('/api/users/currentuser')
+    .set('Cookie', cookie)
     .send()
     .expect(200);
 
-    expect(response.body.currentUser).toEqual(null);
-})
+  expect(response.body.currentUser.email).toEqual('test@test.com');
+});
+
+it('responds with null if not authenticated', async () => {
+  const response = await request(app)
+    .get('/api/users/currentuser')
+    .send()
+    .expect(200);
+
+  expect(response.body.currentUser).toEqual(null);
+});

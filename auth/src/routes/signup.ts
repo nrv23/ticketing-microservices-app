@@ -1,47 +1,50 @@
-import { Router, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import jwt from "jsonwebtoken";
+import { validateRequest, BadRequestError } from "@nrvtickets/common";
 
-import User from "../models/user";
-import { BadRequestError } from '../errors/badrequest-error';
-import { Token } from '../utils/token';
-import { validateRequest } from './middleware/validate-request';
+import { User } from "../models/user";
 
-const router = Router();
+const router = express.Router();
 
-router.post("/api/users/signup", [
-    body("email").isEmail().withMessage("El email debe ser válido"),
-    body("password").trim().isLength({ min: 4, max: 20 }).withMessage("El password debe contener entre 4 y 20 caracteres")
-], validateRequest,async (req: Request, res: Response) => {
-
-   /* const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-       // return res.status(400).send(errors.array());
-    
-        throw new RequestValidationError(errors.array()) // La informacion que se envia en el constructor de la
-        // clase error, es la propiedad message cuando el error es manejado en algun catch o middleware que recibe el
-        // error como parametro de funcion
-    } */
-
+router.post(
+  "/api/users/signup",
+  [
+    body("email").isEmail().withMessage("Email must be valid"),
+    body("password")
+      .trim()
+      .isLength({ min: 4, max: 20 })
+      .withMessage("Password must be between 4 and 20 characters"),
+  ],
+  validateRequest,
+  async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const exists = await User.findOne({email});
+    const existingUser = await User.findOne({ email });
 
-    if(exists) {
-        console.log("Email en uso");
-        throw new BadRequestError("El usuario ya existe");
+    if (existingUser) {
+      throw new BadRequestError("Email in use");
     }
 
-    const user = await (User.build({
-        email,
-        password
-    })).save();
+    const user = User.build({ email, password });
+    await user.save();
 
+    // Generate JWT
+    const userJwt = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET!
+    );
+
+    // Store it on session object
     req.session = {
-        jwt: Token.signToken(user.id, user.email )
+      jwt: userJwt,
     };
-    
-    res.status(201).send(user);
-})
 
-export { router as signupRouter }
+    res.status(201).send(user);
+  }
+);
+
+export { router as signupRouter };

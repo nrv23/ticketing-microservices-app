@@ -24,3 +24,11 @@ build:
         manual:
           - src: "**/*.js" # escuchar cambios en archivos de extension ts
             dest: . # indica la carpeta que se va usar para almacenar la aplicacion en el contenedor
+    - image: nrv2391/ticketing-tickets
+      context: tickets
+      docker: # va a crear una imagen de docker
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts" # escuchar cambios en archivos de extension ts
+            dest: . # indica la carpeta que se va usar para almacenar la aplicacion en el contenedor

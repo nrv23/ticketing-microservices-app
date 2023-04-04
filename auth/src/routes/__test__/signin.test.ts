@@ -1,35 +1,50 @@
 import request from 'supertest';
-import app from '../../app';
+import { app } from '../../app';
 
-it("Devolver codigo 400 por email que no existe", async () => {
+it('fails when a email that does not exist is supplied', async () => {
+  await request(app)
+    .post('/api/users/signin')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(400);
+});
 
-    return request(app)
-        .post("/api/users/signin")
-        .send({
-            "email": "nrv23911@gmail.com",
-            "password": "nvm231191"
-        })
-        .expect(400)
-})
+it('fails when an incorrect password is supplied', async () => {
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(201);
 
-it("Devolver codigo 400 por password inválido", async () => {
+  await request(app)
+    .post('/api/users/signin')
+    .send({
+      email: 'test@test.com',
+      password: 'aslkdfjalskdfj'
+    })
+    .expect(400);
+});
 
-    await  signin();
+it('responds with a cookie when given valid credentials', async () => {
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(201);
 
-    await request(app)
-        .post("/api/users/signin")
-        .send({
-            "email": "nrv2391@gmail.com",
-            "password": ""
-        })
-        .expect(400)
+  const response = await request(app)
+    .post('/api/users/signin')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(200);
 
-})
-
-it("Devolver cookie por login exitoso", async () => {
-
-   const cookie = await  signin();
-
-    expect(cookie).toBeDefined();        
-        
-})
+  expect(response.get('Set-Cookie')).toBeDefined();
+});

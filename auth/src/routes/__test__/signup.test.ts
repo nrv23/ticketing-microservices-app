@@ -1,61 +1,78 @@
 import request from 'supertest';
-import app from '../../app';
+import { app } from '../../app';
 
-it("Devolver codigo 201 como registro exitoso", async () => {
-
-    await  signin();
-})
-
-it("Devolver codigo 400 por email inválido", async () => {
-
-    return request(app)
-        .post("/api/users/signup")
-        .send({
-            "email": "nrv2391@gmail.",
-            "password": "nvm231191"
-        })
-        .expect(400)
-})
-
-
-it("Devolver codigo 400 por password inválido", async () => {
-
-    return request(app)
-        .post("/api/users/signup")
-        .send({
-            "email": "nrv2391@gmail.",
-            "password": "nv1"
-        })
-        .expect(400)
-})
-
-
-it("Devolver codigo 400 por no enviar ningun parametro en el body", async () => {
-
-    return request(app)
-        .post("/api/users/signup")
-        .send({
-
-        })
-        .expect(400)
+it('returns a 201 on successful signup', async () => {
+  return request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(201);
 });
 
-it("No debe permitir registrar correos duplicados", async () => {
+it('returns a 400 with an invalid email', async () => {
+  return request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'alskdflaskjfd',
+      password: 'password'
+    })
+    .expect(400);
+});
 
-    await  signin();
+it('returns a 400 with an invalid password', async () => {
+  return request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'alskdflaskjfd',
+      password: 'p'
+    })
+    .expect(400);
+});
 
-    await request(app)
-        .post("/api/users/signup")
-        .send({
-            email: "nrv2391@gmail.com",
-            password: "nvm231191"
-        })
-        .expect(400)
-})
+it('returns a 400 with missing email and password', async () => {
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com'
+    })
+    .expect(400);
 
-it("Devolver un cookie despues de un registro existoso", async () => {
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      password: 'alskjdf'
+    })
+    .expect(400);
+});
 
-    const cookie = await  signin();
-    
-    expect(cookie).toBeDefined() // comprobar devuelve el cookie que contiene el token 
-})
+it('disallows duplicate emails', async () => {
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(201);
+
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(400);
+});
+
+it('sets a cookie after successful signup', async () => {
+  const response = await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(201);
+
+  expect(response.get('Set-Cookie')).toBeDefined();
+});
