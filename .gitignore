@@ -2,5 +2,6 @@ auth/node_modules
 tickets/node_modules
 common/node_modules
 client/node_modules
+nats/node_modules
 client/.next
 .git
