@@ -1,6 +1,6 @@
 import nats from 'node-nats-streaming';
 import { TicketCreatedPublisher } from './events/ticket-created-publisher';
-TicketCreatedPublisher
+
 
 //crear instancia de cliente de nats-streaming
 const stan = nats.connect('ticketing', 'abc', {

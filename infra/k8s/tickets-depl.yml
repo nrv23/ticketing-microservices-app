@@ -16,6 +16,15 @@ spec:
         - name: tickets
           image: nrv2391/ticketing-tickets
           env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.name # generar un nombre aleatorio para el clientid. En nats los clientid siempre
+                    # deben ser unicos.
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
             - name: MONGO_URI
               value: 'mongodb://tickets-mongo-srv:27017/tickets'
             - name: JWT_SECRET # este es el nombre de la variable de entorno que guarda el secret generic en kubernetes

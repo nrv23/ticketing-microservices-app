@@ -1,7 +1,9 @@
 import { requireAuth, validateRequest, NotFoundError, NotAuthorizedError } from '@nrvtickets/common';
 import { Router, Request, Response } from 'express';
 import { body } from 'express-validator';
+import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publiser';
 import { Ticket } from '../models/ticket';
+import { natsWrapper } from '../src/nats-wrapper';
 
 
 const router = Router();
@@ -31,6 +33,13 @@ router.put('/api/tickets/:id', requireAuth,[
     })
 
     await ticket.save();
+
+    new TicketUpdatedPublisher(natsWrapper.client).publish({
+        id: ticket.id,
+        title: ticket.title,
+        price: ticket.price,
+        userId: ticket.userId
+    })
 
     res.send(ticket);
 })

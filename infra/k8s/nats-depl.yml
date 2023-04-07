@@ -38,7 +38,7 @@ metadata:
   name: nats-srv
 spec:
   selector:
-    app: mats
+    app: nats
   ports:
     - name: client
       protocol: TCP

@@ -1,6 +1,7 @@
 import request from "supertest";
 import { app } from "../../src/app";
 import mongoose from 'mongoose';
+import { natsWrapper } from '../../src/nats-wrapper';
 
 it("devolver codigo 404 si el id del ticket no existe", async () => {
 
@@ -104,3 +105,31 @@ it("Actualizar ticket con información correcta", async () => {
     expect(ticketResponse.body.title).toEqual("new Title");
     expect(ticketResponse.body.price).toEqual(200);
 });
+
+
+it("Puclishes an event", async () => {
+
+
+    const cookie = signin();
+    const response = await request(app)
+        .post(`/api/tickets/`)
+        .set("Cookie", cookie)
+        .send({
+            title: "sdsdf",
+            price: 4
+        });
+
+    const ticketResponse = await request(app)
+        .put(`/api/tickets/${response.body.id}`)
+        .set("Cookie", cookie)
+        .send({
+            title: "new Title",
+            price: 200
+        })
+        .expect(200);
+
+
+
+    expect(natsWrapper.client.publish).toHaveBeenCalled();
+
+})
