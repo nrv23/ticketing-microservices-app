@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders # este nombre auth coincide con el nombre app de matchLabels del deployment, es para indicar los pods que el deployment va administrar o usar
+    spec:
+      containers:
+        - name: orders
+          image: nrv2391/ticketing-orders
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.name # generar un nombre aleatorio para el clientid. En nats los clientid siempre
+                    # deben ser unicos.
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: MONGO_URI
+              value: 'mongodb://orders-mongo-srv:27017/orders'
+            - name: JWT_SECRET # este es el nombre de la variable de entorno que guarda el secret generic en kubernetes
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret # este es el nombre del secret generic que creó en kubernetes
+                  key: JWT_SECRET
+--- # separar la creacion de objetos con 3 guiones
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-srv
+spec:
+  selector:
+    app: orders # sbaer cual o cuales pods va usar este servicio
+  ports:
+    - name: orders
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+
