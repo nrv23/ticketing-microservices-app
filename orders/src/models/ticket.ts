@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
 import { Order, OrderStatus } from './order';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // para actualizar la version del documento en mongodb
+
 
 interface TicketAttrs {
+    id: string;
     title: string;
     price: number;
 }
@@ -10,7 +13,7 @@ interface TicketAttrs {
 export interface TicketDoc extends mongoose.Document {
     title: string;
     price: number;
-
+    version: number;
     isReserved(): Promise<boolean>;
 }
 
@@ -19,6 +22,7 @@ export interface TicketDoc extends mongoose.Document {
 interface TicketModel extends mongoose.Model<TicketDoc> {
 
     build(attrs: TicketAttrs): TicketDoc;
+    findByEvent(event: { id: string, version: number }): Promise<TicketDoc | null>
 }
 
 const ticketSchema = new mongoose.Schema({
@@ -41,9 +45,27 @@ const ticketSchema = new mongoose.Schema({
     }
 });
 
+// cambiar el nombre de la propiedad __v en mongodb
+
+ticketSchema.set("versionKey","version");
+
+ticketSchema.plugin(updateIfCurrentPlugin);
+
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
 
-    return new Ticket(attrs);
+    return new Ticket({
+        _id: attrs.id, // asignar el id generado del ticket service en el order service y tener consistencia en los datos
+        title: attrs.title,
+        price: attrs.price,
+    });
+}
+
+ticketSchema.statics.findByEvent = (event: { id: string, version: number }) => {
+
+    return Ticket.findOne({
+        _id: event.id,
+        version: event.version - 1 // validar la version del documento. Esto con el fin de ejecutar eventos en orden secuencial
+    });
 }
 
 ticketSchema.methods.isReserved = async function () {

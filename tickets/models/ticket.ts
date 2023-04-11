@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { ITicketAttrs } from '../interfaces/ITicketAttrs';
 import { ITicketDoc } from '../interfaces/ITicketDoc';
 import { ITicketModel } from '../interfaces/ITicketModel';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // para actualizar la version del documento en mongodb
 
 const ticketSchema = new mongoose.Schema({
 
@@ -28,6 +29,12 @@ const ticketSchema = new mongoose.Schema({
     }
   }
 });
+
+// cambiar el nombre de la propiedad __v en mongodb
+
+ticketSchema.set("versionKey","version");
+
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 ticketSchema.statics.build = (attrs: ITicketAttrs) => {
 
