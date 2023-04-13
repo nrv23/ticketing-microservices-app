@@ -19,6 +19,9 @@ const ticketSchema = new mongoose.Schema({
     userId: {
         type: String,
         require: true
+    },
+    orderId: {
+      type: String
     }
 },
 {

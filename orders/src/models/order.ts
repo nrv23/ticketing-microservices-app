@@ -1,6 +1,8 @@
 import { OrderStatus } from '@nrvtickets/common';
 import mongoose from 'mongoose';
 import { TicketDoc } from './ticket';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+
 
 export { OrderStatus };
 
@@ -51,6 +53,12 @@ const orderSchema = new mongoose.Schema({
         }
     }
 });
+
+// cambiar el nombre de la propiedad __v en mongodb
+
+orderSchema.set("versionKey","version");
+
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: orderAttrs) => {
     

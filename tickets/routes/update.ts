@@ -1,4 +1,4 @@
-import { requireAuth, validateRequest, NotFoundError, NotAuthorizedError } from '@nrvtickets/common';
+import { requireAuth, validateRequest, NotFoundError, NotAuthorizedError, BadRequestError } from '@nrvtickets/common';
 import { Router, Request, Response } from 'express';
 import { body } from 'express-validator';
 import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publiser';
@@ -21,12 +21,22 @@ router.put('/api/tickets/:id', requireAuth,[
         throw new NotFoundError();
     }
 
+    //validar que el ticket no esta reservado
+
+    if(ticket.orderId) { // el ticket ya esta reservado
+        throw new BadRequestError("El ticket ya está reservado");
+    }
+
     // valida que el ticket sea del usuario actual 
 
     if(ticket.userId !== req.currentUser!.id) {
 
         throw new NotAuthorizedError();
     }
+
+    
+
+
 
     ticket.set({
         title, price

@@ -3,10 +3,7 @@ import { natsWrapper } from './nats-wrapper';
 import { app } from "./app";
 import { TicketCreatedListener } from './events/listeners/ticket-created-listener';
 import { TicketUpdatedListener } from './events/listeners/ticket-updated-listener';
-
-
-
-
+import { ExpirationCompleteListener } from "./events/listeners/expiration-complete-listener";
 
 
 // Ejecutar el servidor
@@ -53,7 +50,7 @@ const start = async () => {
     // las ordenes y los ticquetes van a estar en el mismo servicio de ordenes para qie sea facil buscar la orden asociada al ticket
     new TicketCreatedListener(natsWrapper.client).listen();
     new TicketUpdatedListener(natsWrapper.client).listen();
-
+    new ExpirationCompleteListener(natsWrapper.client).listen();
     
     await mongoose.connect(process.env.MONGO_URI, {});
     console.log("Connected to MongoDb");

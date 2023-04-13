@@ -3,12 +3,13 @@ import request from 'supertest';
 import { app } from '../app';
 import { Ticket } from '../models/ticket';
 import { natsWrapper } from '../nats-wrapper';
-
+import mongoose from 'mongoose';
 it("Marcar una orden como cancelada", async () => {
 
     const ticket = Ticket.build({
         title: "Concert",
-        price: 20
+        price: 20,
+        id: new mongoose.Types.ObjectId().toHexString()
     });
 
     await ticket.save();
@@ -41,7 +42,8 @@ it("Emitir un evento de orden cancelada", async () => {
 
     const ticket = Ticket.build({
         title: "Concert",
-        price: 20
+        price: 20,
+        id: new mongoose.Types.ObjectId().toHexString()
     });
 
     await ticket.save();

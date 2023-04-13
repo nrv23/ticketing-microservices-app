@@ -40,4 +40,11 @@ build:
         manual:
           - src: "src/**/*.ts" # escuchar cambios en archivos de extension ts
             dest: . # indica la carpeta que se va usar para almacenar la aplicacion en el contenedor
-
+    - image: nrv2391/ticketing-expiration
+      context: expiration
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .

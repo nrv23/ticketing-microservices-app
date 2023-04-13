@@ -22,7 +22,8 @@ it("retorna error si el ticket ya está reservado", async () => {
 
     const ticket = Ticket.build({
         title: "Concert",
-        price: 20
+        price: 20,
+        id: new mongoose.Types.ObjectId().toHexString()
     });
 
     await ticket.save();
@@ -50,7 +51,8 @@ it("reserva un ticket", async () => {
 
     const ticket = Ticket.build({
         title: "Concert",
-        price: 20
+        price: 20,
+        id: new mongoose.Types.ObjectId().toHexString()
     });
 
     await ticket.save();
@@ -69,7 +71,8 @@ it("emitir un evento cuando se crea una orden", async () => {
 
     const ticket = Ticket.build({
         title: "Concert",
-        price: 20
+        price: 20,
+        id: new mongoose.Types.ObjectId().toHexString()
     });
 
     await ticket.save();
