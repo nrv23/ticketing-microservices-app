@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments
+  template:
+    metadata:
+      labels:
+        app: payments # este nombre auth coincide con el nombre app de matchLabels del deployment, es para indicar los pods que el deployment va administrar o usar
+    spec:
+      containers:
+        - name: payments
+          image: nrv2391/ticketing-payments
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.name # generar un nombre aleatorio para el clientid. En nats los clientid siempre
+                    # deben ser unicos.
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: MONGO_URI
+              value: 'mongodb://payments-mongo-srv:27017/payments'
+            - name: JWT_SECRET # este es el nombre de la variable de entorno que guarda el secret generic en kubernetes
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret # este es el nombre del secret generic que creó en kubernetes
+                  key: JWT_SECRET
+--- # separar la creacion de objetos con 3 guiones
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-srv
+spec:
+  selector:
+    app: payments # sbaer cual o cuales pods va usar este servicio
+  ports:
+    - name: payments
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+

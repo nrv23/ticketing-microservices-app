@@ -34,6 +34,7 @@ export abstract class Listener<T extends Event> {
 
     listen() {
         
+        console.log("Escuchando desde ", this.subject );
         const subscription = this.client.subscribe(
             this.subject,
             this.queueGroupName,

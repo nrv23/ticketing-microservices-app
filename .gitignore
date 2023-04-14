@@ -5,5 +5,6 @@ client/node_modules
 nats/node_modules
 orders/node_modules
 expiration/node_modules
+payments/node_modules
 client/.next
 .git
