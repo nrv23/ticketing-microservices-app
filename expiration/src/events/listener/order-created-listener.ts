@@ -10,7 +10,7 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
 
     async onMessage(data: OrderCreatedEvent["data"], msg: Message) {
 
-        const delay = 10000//new Date(data.expiresAt).getTime() - new Date().getTime(); // respuesta en milisegundos 
+        const delay = new Date(data.expiresAt).getTime() - new Date().getTime(); // respuesta en milisegundos 
         console.log("Tiempo de espera en milisegundos", delay)
         // agregar los eventos a la cola de trabajo
         await expirationQueue.add(

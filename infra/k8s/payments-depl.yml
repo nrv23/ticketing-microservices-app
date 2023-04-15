@@ -32,6 +32,11 @@ spec:
                 secretKeyRef:
                   name: jwt-secret # este es el nombre del secret generic que creó en kubernetes
                   key: JWT_SECRET
+            - name: API_SECRET # este es el nombre de la variable de entorno que guarda el secret generic en kubernetes
+              valueFrom:
+                secretKeyRef:
+                  name: stripe-secret # este es el nombre del secret generic que creó en kubernetes
+                  key: API_SECRET
 --- # separar la creacion de objetos con 3 guiones
 apiVersion: v1
 kind: Service

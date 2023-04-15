@@ -1,0 +1,35 @@
+En microservicios, se impelmenta un patron llamado database-per-service, lo que se conoce como database por servicio.
+Cada microservicio debe funciona de forma independiente y debe tener su propia base de datos
+docker run -it --rm posts_service sh 
+ al ejecutar el comand sh al crear un contenedor en docker, es como iniciar sesion dentro de ese contenedor como si fuera una maquina
+ virtual
+En caso de que no se refresque automaticamente el cambio en skaffold, usar este comando en el package.json ts-node-dev --poll src/index.ts
+
+en un hook de mongodb no se debe usar funciones de flecha porque al usar la palabra reversada this, entenderia como contexto 
+todo el contenido del archivo y no solo el contexto del funcion del hook
+
+Diferencias entre cookies y jwt 
+cookies:
+    mecanismo de transporte
+    transportar o mover cualquier tipo de información del navegador al servidor.
+    administrado automaticamente por el navegador
+    se puede usar para autenticacion, pero no es su objetivo final.
+jwt:
+    mecanismo de autenticacion y autorizacion
+    almacena cualquier tipo de información
+    el desarrollador debe manejar el envio del token por alguna cabecera que se envie en la peticion al servidor
+
+comando para crear un objeto generic que almacena contraseñas o claves secretas en clusteres dentro de kubernetes
+
+kubectl create secret generic jwt-secret --from-literal=JWT_SECRET=SECRET_KEY_123
+
+kubectl get services -n ingress-nginx
+ingress-nginx-controller
+
+kubectl port-forward nats-depl-5d8f6fdd69-lq22l 4222:4222 para poder conectar el pod que corre el servicio nats 
+kubectl port-forward nats-depl-5d8f6fdd69-lq22l 8222:8222 para poder conectar el pod que corre el servicio nats 
+
+Si un servicio falla al conectar con nats es porque seguramente el servicio levantó antes qye el servidor de nats, lo que 
+debe hacer es eliminar el pod y kubernetes lo generará e iniciará automaticamente.
+
+kubectl delete pod NOMBRE_POD

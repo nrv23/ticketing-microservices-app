@@ -2,6 +2,7 @@ import express from "express";
 import "express-async-errors";
 import cookieSession from "cookie-session";
 import { errorHandler, NotFoundError, currentUser } from "@nrvtickets/common";
+import { createChargeRouter } from "./routes/new";
 
 
 const app = express();
@@ -15,7 +16,7 @@ app.use(
 );
 
 app.use(currentUser); // validar que la peitcion entrante sea de alguien autenticado
-
+app.use(createChargeRouter);
 
 app.all("*", async (req, res) => {
   throw new NotFoundError();
