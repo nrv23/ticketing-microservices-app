@@ -1,6 +1,6 @@
 {
   "name": "@nrvtickets/common",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
@@ -12,7 +12,6 @@
     "build": "npm run clean && tsc",
     "push": "npm publish",
     "pub": "git add . && git commit -m \"Updates\" && npm version patch && npm run build && npm run push"
-    
   },
   "keywords": [],
   "author": "",
