@@ -8,9 +8,11 @@ import {
 } from '@nrvtickets/common';
 import { Router, Request, Response } from 'express';
 import { body } from 'express-validator';
+import { PaymentCreatedPublisher } from '../events/publisher/payment-created-publisher';
 import { Order } from '../models/order';
+import { Payment } from '../models/payment';
+import { natsWrapper } from '../nats-wrapper';
 import { stripe } from '../stripe';
-
 
 const router = Router();
 
@@ -40,13 +42,26 @@ router.post('/api/payments',
             throw new BadRequestError("No se puede procesar el pago de una orden cancelada");
         }
 
-        await stripe.charges.create({
+        const charge =  await stripe.charges.create({
             currency: "usd",
             amount: order.price * 100, // se debe enviar en centavos
             source: token
+        });
+
+        const payment =  Payment.build({
+            orderId,
+            stripeId: charge.id
         })
 
-        res.send({success: true});        
+        await payment.save();
+        
+        new PaymentCreatedPublisher(natsWrapper.client).publish({
+            id: payment.id,
+            orderId: payment.orderId,
+            stripeId: payment.stripeId
+        })
+
+        res.status(201).send({ id: payment.id});       
 })
 
 

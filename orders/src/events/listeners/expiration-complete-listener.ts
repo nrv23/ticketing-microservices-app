@@ -18,6 +18,11 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
             throw new Error("Orden no encontrada");
         }
 
+        if(order.status === OrderStatus.Complete) {
+
+            return msg.ack(); // como la orden esta completa entonces solo se marca el evento como exitoso
+        }
+
         order.set({
             status: OrderStatus.Cancelled
         });
