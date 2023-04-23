@@ -7,7 +7,7 @@ export default () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const {doRequest,errors} = useRequest({
+    const { doRequest, errors } = useRequest({
         url: "/api/users/signin",
         method: "post",
         body: {
@@ -15,17 +15,18 @@ export default () => {
             password
         },
         onSuccess: () => Router.push("/")
-    }) 
+    })
 
     const submit = async e => {
 
         e.preventDefault();
 
-       await doRequest();
-       
+        await doRequest();
+
     }
 
-    return <div className="container">
+    return (
+
         <form onSubmit={submit}>
             <h1>Sign In</h1>
             <div className="form-group">
@@ -52,5 +53,6 @@ export default () => {
                 Submit
             </button>
         </form>
-    </div>
+    )
+
 }

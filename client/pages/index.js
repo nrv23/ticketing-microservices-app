@@ -1,17 +1,43 @@
-import buildClient from "../api/build-client";
+import Link from 'next/link';
+const LandingPage = ({ currentUser, tickets }) => { // se recibe en los props del componente
 
-const LandingPage = ({ currentUser }) => {
+  const ticketList = tickets.map(ticket =>(
+    <tr key={ticket.id}>
+      <td>{ticket.title}</td>
+      <td>{ticket.price}</td>
+      <td>
+        <Link href="/tickets/[ticketId]" as={`/tickets/${ticket.id}`} >
+          <a>Ver</a>
+        </Link>
+      </td>
+    </tr>
+  ))
 
-  console.log({ currentUser });
-
-  return currentUser ? <h1>Está logueado</h1>: <h1>No está logueado</h1>;
+  return ( 
+    <div>
+      <h1>Tickets</h1>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Precio</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ticketList}
+        </tbody>
+      </table>
+    </div>
+    
+  );
 };
 
-LandingPage.getInitialProps = async (context) => {
-  console.log({context});
-  const client = buildClient(context);
-  const response = await client.get('/api/users/currentuser');
-  return response.data;
+LandingPage.getInitialProps = async (context,client,currentUser) => {
+
+  const { data: tickets } = await client.get('/api/tickets/');
+  
+  return { tickets }; // se va fusionar con los props del componente
 }
 
 export default LandingPage;
