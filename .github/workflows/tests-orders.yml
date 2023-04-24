@@ -1,11 +1,12 @@
-name: tests
+
+name: tests-orders
 
 on: # cuando se crea un pull request entonces las acciones de github se ejecutan
   pull_request
 
 jobs:
   build:
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     steps: 
       - uses: actions/checkout@v2
-      - run: cd auth && npm install && npm run test:ci
+      - run: cd orders && npm install && npm run test:ci
