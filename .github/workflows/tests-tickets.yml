@@ -1,0 +1,11 @@
+name: tests-tickets
+
+on: # cuando se crea un pull request entonces las acciones de github se ejecutan
+  pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v2
+      - run: cd tickets && npm install && npm run test:ci
