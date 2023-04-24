@@ -10,6 +10,7 @@ import { PaymentCreatedListener } from "./events/listeners/payment-created-liste
 // Ejecutar el servidor
 
 const start = async () => {
+  console.log("Iniciando....");
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET must be defined");
   }
