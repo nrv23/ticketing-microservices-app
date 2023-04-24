@@ -8,3 +8,4 @@ expiration/node_modules
 payments/node_modules
 client/.next
 .git
+.DS_Store
